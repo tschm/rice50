@@ -21,11 +21,11 @@ CODE  := $(wildcard code/*.py)
 # Intermediate files pdfLaTeX leaves behind.
 JUNK := $(addprefix $(MAIN).,aux log out toc lof lot bbl blg fls synctex.gz)
 
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := help
 .DELETE_ON_ERROR:
-.PHONY: all assets check clean distclean help view warnings
+.PHONY: compile assets check clean help view warnings
 
-all: $(MAIN).pdf  ## Build the PDF (default)
+compile: $(MAIN).pdf  ## Build the PDF
 
 $(MAIN).pdf: $(MAIN).tex siamltex.cls siam10.clo $(STAMP)
 	@pass=1; \
@@ -67,10 +67,6 @@ view: $(MAIN).pdf  ## Open the built PDF
 
 clean:  ## Remove LaTeX intermediates, keep the PDF and the generated assets
 	@rm -f $(JUNK)
-
-distclean: clean  ## Also remove the PDF and everything code/paper.py generates
-	@rm -f $(MAIN).pdf $(STAMP)
-	@rm -rf figs tables snippets code/__pycache__
 
 help:  ## List targets
 	@grep -hE '^[a-z][a-z-]*:.*##' $(MAKEFILE_LIST) \
