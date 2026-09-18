@@ -30,9 +30,12 @@ The original is twenty years old and three of its sections needed work.
   controls function values and says nothing about where the roots go.
   Rouché's theorem closes it.
 
-The MATLAB and Mathematica of 2005 has been rewritten in Python. An appendix
+The MATLAB and Mathematica of 2005 has been rewritten in Python — Claude Opus 5
+was asked to revisit the original article and redo its experiments. An appendix
 adds a sixth problem, the integral of $\sin^2(\tan(\tan(\pi x)))$ over $[0,1]$,
-which is where the mathematics is.
+which is where the mathematics is; that argument was afterwards worked out with
+Folkmar Bornemann and published as *Taming a hydra of singularities*, Amer.
+Math. Monthly **114** (2007), no. 8, 727–732.
 
 ## Nothing is typed by hand
 
@@ -51,7 +54,8 @@ so the paper and the code cannot drift apart.
 ## Building
 
 Needs [`uv`](https://astral.sh/uv) and a pdfLaTeX with the recommended LaTeX
-and font packages. `uv` handles the Python dependencies itself — `code/paper.py`
+and font packages. The document is plain `article` and loads only `fontenc`,
+`lmodern`, `amsmath`, `amssymb` and `graphicx`, so a bare TeX Live builds it. `uv` handles the Python dependencies itself — `code/paper.py`
 declares them inline (PEP 723), so there is no environment to set up.
 
 ```
@@ -70,6 +74,10 @@ source, the class, and the generated figures, tables and listings — and zips
 them. No Python and no Makefile goes in: the archive has to build with nothing
 installed but TeX, and it is checked here by building the PDF first.
 
+If you submit it, math.HO is the category that fits a problem-solutions note
+(math.NA as a cross-list), and the MSC classes in the paper's own header —
+00A08, 30E20, 60J10, 65D30, 65F15, 65L05 — are what the submission form wants.
+
 `make assets` takes a few minutes: several of the problems are integrated in
 30-digit arithmetic and each answer is computed twice, at two precisions or by
 two methods.
@@ -78,7 +86,6 @@ two methods.
 
 ```
 digit50.tex                 the paper
-siamltex.cls, siam10.clo    the SIAM class it is set in
 THE_RICE_SIAM_CHAPTER_...pdf  the 2005 original, kept for comparison
 code/paper.py               the driver: writes figs/, tables/ and snippets/
 code/knights.py             problem 1, a 4096-state Markov chain

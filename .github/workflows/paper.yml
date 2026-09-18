@@ -49,7 +49,8 @@ jobs:
           # and the publish step below has something to compare.
           export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
           export FORCE_SOURCE_DATE=1
-          make
+          # Named explicitly: the default goal is `help`, which builds nothing.
+          make compile
 
       - uses: actions/upload-artifact@v4
         with:

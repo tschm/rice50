@@ -31,7 +31,7 @@ ARXIVDIR := .arxiv
 
 compile: $(MAIN).pdf  ## Build the PDF
 
-$(MAIN).pdf: $(MAIN).tex siamltex.cls siam10.clo $(STAMP)
+$(MAIN).pdf: $(MAIN).tex $(STAMP)
 	@pass=1; \
 	while :; do \
 	  echo "==> $(TEX) $(MAIN).tex (pass $$pass)"; \
@@ -67,15 +67,16 @@ arxiv: $(ARXIV)  ## Pack the LaTeX source into a zip for arXiv
 
 # arXiv runs LaTeX itself, so the archive carries the source and the generated
 # inputs -- figures, tables and listings -- but no Python and no Makefile: it
-# has to build with nothing installed but TeX.  The bibliography is inline, so
-# there is no .bbl to ship.  Built from $(MAIN).pdf so that nothing is uploaded
-# that has not just compiled here.
+# has to build with nothing installed but TeX.  The document is plain article
+# loading only amsmath, amssymb and graphicx, so no class file goes in, and
+# the bibliography is inline, so there is no .bbl either.  Built from
+# $(MAIN).pdf so that nothing is uploaded that has not just compiled here.
 $(ARXIV): $(MAIN).pdf
 	@command -v zip >/dev/null || { echo "error: zip not found" >&2; exit 1; }
 	@$(MAKE) --no-print-directory check
 	@rm -rf $(ARXIVDIR) $@
 	@mkdir -p $(ARXIVDIR)
-	@cp $(MAIN).tex siamltex.cls siam10.clo $(ARXIVDIR)/
+	@cp $(MAIN).tex $(ARXIVDIR)/
 	@for d in figs tables snippets; do \
 	  [ -d $$d ] || continue; \
 	  mkdir -p $(ARXIVDIR)/$$d; \

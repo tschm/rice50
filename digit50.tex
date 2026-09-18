@@ -1,10 +1,52 @@
 %% The Rice SIAM chapter 50-digit challenge (2005), corrected edition.
-%% Build:  make pdf      (needs figs/, tables/ and snippets/, all written by
-%%                        make check, which runs code/paper.py)
-\documentclass[final]{siamltex}
+%% Build:  make compile  (needs figs/, tables/ and snippets/, all written by
+%%                        make assets, which runs code/paper.py)
+%%
+%% Plain article: the note is not a SIAM paper and should not wear the SIAM
+%% journal class.  Everything siamltex supplied and article does not is
+%% rebuilt below, with no package beyond the three loaded here, so the source
+%% compiles on a bare TeX Live -- which is what arXiv gives it.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[pdftex]{graphicx}
+
+% A text block narrower than article's default.  Plain lengths rather than
+% geometry, which is not in the minimal TeX Live the CI installs.
+\setlength{\textwidth}{6in}
+\setlength{\textheight}{8.6in}
+\setlength{\oddsidemargin}{0.25in}
+\setlength{\evensidemargin}{0.25in}
+\setlength{\topmargin}{0in}
+\setlength{\headsep}{20pt}
+
+\makeatletter
+% Run-in section numbers -- "1. Introduction", and "Appendix A. A sixth
+% problem" once \appendix has been seen.  The prefix is looked up per level
+% with \csname rather than tested with \ifx, because \@sect puts this through
+% a \protected@edef, where a \def in the body would come apart.  Only the
+% section level carries a prefix, so subsections stay "A.1".
+\newcommand\@seccntpre@section{}
+\newcommand\@seccntpre@subsection{}
+\renewcommand\@seccntformat[1]{%
+  \csname @seccntpre@#1\endcsname\csname the#1\endcsname.\hskip 0.5em\relax}
+\g@addto@macro\appendix{\renewcommand\@seccntpre@section{\appendixname~}}
+\makeatother
+
+% The four environments the note uses that article does not define.
+\newtheorem{lemma}{Lemma}[section]
+\newenvironment{proof}
+  {\par\noindent\textit{Proof.}\ \ignorespaces}
+  {\hfill$\square$\par\medskip}
+\newenvironment{keywords}
+  {\par\medskip\noindent\small\textbf{Key words.}\ \ignorespaces}
+  {\par}
+\newenvironment{AMS}
+  {\par\smallskip\noindent\small\textbf{AMS subject classifications.}\ %
+   \ignorespaces}
+  {\par\medskip}
 
 \parskip = 5pt minus 1pt
 \raggedbottom
@@ -21,9 +63,10 @@
 this is a corrected edition. Section 6 of the original gave the wrong
 answer, and Sections 3 and 5 drew the wrong conclusion from a right one.
 Section 1.1 lists everything that changed. The code is at
-\texttt{code/}, and \texttt{make check} reproduces every number below.}}
+\texttt{code/}, and \texttt{make assets} reproduces every number below.}}
 \author{Thomas Schmelzer\thanks{Computing Laboratory, Oxford University.
 The author was supported by the Rhodes Trust.}}
+\date{}
 
 \begin{document}
 \maketitle
@@ -36,6 +79,16 @@ competition which culminated in a beautiful book \cite{bornemann}. This note
 gives my solutions, an alternative sixth problem, and an appendix on the
 integral of $\sin^2(\tan(\tan(\pi x)))$, which is where the mathematics is.
 \end{abstract}
+
+\begin{keywords}
+high-accuracy computation, Markov chain, elliptic billiard, Rouch\'e's
+theorem, Taylor-series integration, elastic collision, contour shift,
+reproducible computation
+\end{keywords}
+
+\begin{AMS}
+00A08, 30E20, 60J10, 65D30, 65F15, 65L05
+\end{AMS}
 
 \section{Introduction}
 Each of the questions below has an answer that is a single real number. The
@@ -122,11 +175,12 @@ spread. Both experiments are now run, and separately.
 polynomial controls function values and says nothing about where the roots
 are. Rouch\'e's theorem fills it in two lines.
 
-The MATLAB and Mathematica of 2005 has been rewritten in Python, and the
-listings in this note are extracted from the files that produce its numbers,
-so the two cannot drift apart. Every figure, table and displayed constant
-comes out of \texttt{make check}. I have also fixed the typography and the
-typing, of which there was a good deal.
+The MATLAB and Mathematica of 2005 has been rewritten in Python: Claude
+Opus 5 was asked to revisit the original article and redo its experiments.
+The listings in this note are extracted from the files that produce its
+numbers, so the two cannot drift apart, and every figure, table and
+displayed constant comes out of \texttt{make assets}. I have also fixed the
+typography and the typing, of which there was a good deal.
 
 \section{A Markov chain}
 We analyse the random walk of two knights on a chessboard.
@@ -530,11 +584,14 @@ derivation. An alternative problem is stated in the appendix.
 \end{table}
 
 The numbers come with a guarantee this time: each is reproduced by
-\texttt{make check}, at two precisions or by two methods.
+\texttt{make assets}, at two precisions or by two methods.
 
 \begin{thebibliography}{9}
 \bibitem{bornemann} F. Bornemann, D. Laurie, S. Wagon and J. Waldvogel,
-\emph{The SIAM 100-Digit Challenge}, SIAM, Philadelphia, 2004.
+\emph{The SIAM 100-Digit Challenge: A Study in High-Accuracy Numerical
+Computing}, SIAM, Philadelphia, 2004.
+\bibitem{hydra} F. Bornemann and T. Schmelzer, \emph{Taming a hydra of
+singularities}, Amer. Math. Monthly \textbf{114} (2007), no.~8, 727--732.
 \bibitem{trefethen} L. N. Trefethen and D. Bau, III, \emph{Numerical Linear
 Algebra}, SIAM, Philadelphia, 1997.
 \end{thebibliography}
@@ -553,7 +610,10 @@ problem would then be published. Here is my suggestion.
 It was Brian Davies who pointed out that the evaluation would involve
 serious difficulties both numerically and analytically. It is hard to
 integrate this function on the real line, but a small step into the complex
-plane gives us everything.
+plane gives us everything. The argument sketched here was afterwards worked
+out with Folkmar Bornemann and published in the Monthly \cite{hydra}, where
+the integrand is one member of a family and the closed form below is one
+value of a limit.
 
 \subsection{Existence}
 The function $f(x) = \sin^2(\tan(\tan(\pi x)))$ is undefined at some points
@@ -693,5 +753,9 @@ To ten digits, the sixth problem has the answer
 \[
    \integralshort .
 \]
+
+The same contour shift handles $\sin^2$ of any number of nested tangents,
+and the values approach a limit that \cite{hydra} identifies; the problem
+above is the second member of that family.
 
 \end{document}
