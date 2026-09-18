@@ -3,6 +3,10 @@
 # The built paper
 digit50.pdf
 
+# The arXiv submission and its staging directory
+digit50-arxiv.zip
+.arxiv/
+
 # pdfLaTeX intermediates
 *.aux
 *.log

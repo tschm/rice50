@@ -21,9 +21,13 @@ CODE  := $(wildcard code/*.py)
 # Intermediate files pdfLaTeX leaves behind.
 JUNK := $(addprefix $(MAIN).,aux log out toc lof lot bbl blg fls synctex.gz)
 
+# The arXiv submission: the sources arXiv compiles, staged and zipped.
+ARXIV    := $(MAIN)-arxiv.zip
+ARXIVDIR := .arxiv
+
 .DEFAULT_GOAL := help
 .DELETE_ON_ERROR:
-.PHONY: compile assets check clean help view warnings
+.PHONY: compile assets arxiv check clean help view warnings
 
 compile: $(MAIN).pdf  ## Build the PDF
 
@@ -59,6 +63,28 @@ check:  ## Report inputs referenced by the source but missing on disk
 	done; \
 	[ $$missing -eq 0 ] || { echo "error: inputs above are referenced by $(MAIN).tex but absent; run 'make assets'" >&2; exit 1; }
 
+arxiv: $(ARXIV)  ## Pack the LaTeX source into a zip for arXiv
+
+# arXiv runs LaTeX itself, so the archive carries the source and the generated
+# inputs -- figures, tables and listings -- but no Python and no Makefile: it
+# has to build with nothing installed but TeX.  The bibliography is inline, so
+# there is no .bbl to ship.  Built from $(MAIN).pdf so that nothing is uploaded
+# that has not just compiled here.
+$(ARXIV): $(MAIN).pdf
+	@command -v zip >/dev/null || { echo "error: zip not found" >&2; exit 1; }
+	@$(MAKE) --no-print-directory check
+	@rm -rf $(ARXIVDIR) $@
+	@mkdir -p $(ARXIVDIR)
+	@cp $(MAIN).tex siamltex.cls siam10.clo $(ARXIVDIR)/
+	@for d in figs tables snippets; do \
+	  [ -d $$d ] || continue; \
+	  mkdir -p $(ARXIVDIR)/$$d; \
+	  cp $$d/* $(ARXIVDIR)/$$d/; \
+	done
+	@echo "==> $@"
+	@cd $(ARXIVDIR) && zip -rX ../$@ . | sed -E 's/^ *adding: /  /'
+	@rm -rf $(ARXIVDIR)
+
 warnings: $(MAIN).pdf  ## Show over/underfull boxes and LaTeX warnings from the last build
 	@grep -nE 'Warning|Overfull|Underfull' $(MAIN).log || echo "no warnings"
 
@@ -67,6 +93,7 @@ view: $(MAIN).pdf  ## Open the built PDF
 
 clean:  ## Remove LaTeX intermediates, keep the PDF and the generated assets
 	@rm -f $(JUNK)
+	@rm -rf $(ARXIVDIR) $(ARXIV)
 
 help:  ## List targets
 	@grep -hE '^[a-z][a-z-]*:.*##' $(MAKEFILE_LIST) \
