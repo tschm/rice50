@@ -1,0 +1,14 @@
+\begin{verbatim}
+def reflect(p, v, a, b):
+    """Specular reflection at p on the ellipse with semi-axes a, b.
+
+    The outward normal of x^2/a^2 + y^2/b^2 = 1 at p is
+    (px/a^2, py/b^2); the tangential part of v survives and the
+    normal part changes sign.
+    """
+    n = (p[0] / a ** 2, p[1] / b ** 2)
+    scale = mp.sqrt(n[0] ** 2 + n[1] ** 2)
+    n = (n[0] / scale, n[1] / scale)
+    s = 2 * (v[0] * n[0] + v[1] * n[1])
+    return (v[0] - s * n[0], v[1] - s * n[1])
+\end{verbatim}

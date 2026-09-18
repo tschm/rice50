@@ -1,0 +1,25 @@
+\begin{verbatim}
+def flight(dp, dv, target, leaving):
+    """Smallest t > 0 with |dp + t dv| = target, or infinity.
+
+    `leaving` says the state is already on this surface, so t = 0 is a
+    root of the quadratic.  Dividing it out leaves -b/a exactly and no
+    tolerance enters.  After a collision it returns a negative number,
+    which correctly reports that the discs are separating.
+    """
+    a = dot(dv, dv)
+    if a == 0:
+        return mp.inf
+    b = 2 * dot(dp, dv)
+    if leaving:
+        t = -b / a
+        return t if t > 0 else mp.inf
+    c = dot(dp, dp) - target ** 2
+    disc = b * b - 4 * a * c
+    if disc < 0:
+        return mp.inf
+    root = mp.sqrt(disc)
+    ts = [t for t in ((-b - root) / (2 * a), (-b + root) / (2 * a))
+          if t > 0]
+    return min(ts) if ts else mp.inf
+\end{verbatim}

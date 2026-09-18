@@ -16,9 +16,9 @@ digit50.pdf
 *.synctex.gz
 
 # Written by code/paper.py
-figs/
+# figs/
 tables/
-snippets/
+# snippets/
 .assets.stamp
 
 # Python

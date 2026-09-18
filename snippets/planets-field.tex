@@ -1,0 +1,11 @@
+\begin{verbatim}
+def field(u, v, masses=MASSES):
+    """The acceleration of each mass, positions as complex numbers."""
+    a = np.zeros(len(u), dtype=complex)
+    for i in range(len(u)):
+        for j in range(len(u)):
+            if i != j:
+                d = u[j] - u[i]
+                a[i] += masses[j] * d / abs(d) ** 3
+    return a
+\end{verbatim}

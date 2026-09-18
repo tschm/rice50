@@ -1,0 +1,43 @@
+\begin{verbatim}
+def run(dps=40, rule=collide, shift=0, trace=False):
+    """Distance between the two centres at t = 10."""
+    mp.mp.dps = dps
+    wall = 1 - RADIUS                 # a centre touches the bowl here
+    touch = 2 * RADIUS                # the centres touch here
+    p1 = (mp.mpf(1) / 2 + shift, mp.mpf(1) / 8)
+    p2 = (mp.mpf(0), mp.mpf(1) / 2)
+    v1, v2 = unit((-p1[0], -p1[1])), unit((-p2[0], -p2[1]))
+
+    path1, path2 = [p1], [p2]
+    on, walls, contacts, angle, rem = None, 0, 0, None, mp.mpf(TEND)
+    while rem > 0:
+        dp = (p1[0] - p2[0], p1[1] - p2[1])
+        dv = (v1[0] - v2[0], v1[1] - v2[1])
+        dt, kind = min((flight(p1, v1, wall, on == "w1"), "w1"),
+                       (flight(p2, v2, wall, on == "w2"), "w2"),
+                       (flight(dp, dv, touch, on == "c"), "c"))
+        if dt >= rem:
+            dt, kind = rem, "stop"
+        p1 = (p1[0] + dt * v1[0], p1[1] + dt * v1[1])
+        p2 = (p2[0] + dt * v2[0], p2[1] + dt * v2[1])
+        rem -= dt
+        if trace:
+            path1.append(p1)
+            path2.append(p2)
+        if kind == "stop":
+            break
+        if kind == "w1":
+            v1, walls = reflect(p1, v1), walls + 1
+        elif kind == "w2":
+            v2, walls = reflect(p2, v2), walls + 1
+        else:
+            if angle is None:
+                angle = impact_angle(p1, p2, v1, v2)
+            v1, v2 = rule(p1, p2, v1, v2)
+            contacts += 1
+        on = kind
+    return dict(distance=norm((p1[0] - p2[0], p1[1] - p2[1])),
+                walls=walls, contacts=contacts, angle=angle,
+                energy=(dot(v1, v1) + dot(v2, v2)) / 2,
+                path1=path1, path2=path2)
+\end{verbatim}

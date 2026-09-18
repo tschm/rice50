@@ -1,0 +1,11 @@
+\begin{verbatim}
+def power_series(v, alpha, order):
+    """Coefficients of v^alpha from the coefficients of v."""
+    w = [v[0] ** alpha]
+    for n in range(1, order + 1):
+        acc = mp.mpf(0)
+        for k in range(n):
+            acc += (alpha * (n - k) - k) * w[k] * v[n - k]
+        w.append(acc / (n * v[0]))
+    return w
+\end{verbatim}

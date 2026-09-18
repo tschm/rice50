@@ -1,0 +1,13 @@
+\begin{verbatim}
+def collide(p1, p2, v1, v2):
+    """Elastic impact of two smooth unit masses in contact.
+
+    The impulse is a multiple of the line of centres n, and
+    conservation of energy fixes the multiple.  The normal part of
+    the relative velocity reverses, the tangential part does not.
+    """
+    n = unit((p1[0] - p2[0], p1[1] - p2[1]))
+    s = dot((v1[0] - v2[0], v1[1] - v2[1]), n)
+    return ((v1[0] - s * n[0], v1[1] - s * n[1]),
+            (v2[0] + s * n[0], v2[1] + s * n[1]))
+\end{verbatim}

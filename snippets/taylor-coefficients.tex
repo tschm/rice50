@@ -1,0 +1,49 @@
+\begin{verbatim}
+def coefficients(x, y, vx, vy, masses, order):
+    """Taylor coefficients of each coordinate about the state."""
+    n_bodies = len(masses)
+    X = [[xi] for xi in x]
+    Y = [[yi] for yi in y]
+    VX = [[vi] for vi in vx]
+    VY = [[vi] for vi in vy]
+    pairs = [(i, j) for i in range(n_bodies)
+             for j in range(i + 1, n_bodies)]
+    R2 = {p: [] for p in pairs}
+    G = {p: [] for p in pairs}
+
+    for n in range(order + 1):
+        for (i, j) in pairs:
+            dx = [X[j][k] - X[i][k] for k in range(n + 1)]
+            dy = [Y[j][k] - Y[i][k] for k in range(n + 1)]
+            R2[(i, j)].append(
+                sum(dx[k] * dx[n - k] + dy[k] * dy[n - k]
+                    for k in range(n + 1)))
+            r2 = R2[(i, j)]
+            if n == 0:
+                G[(i, j)].append(r2[0] ** ALPHA)
+            else:
+                g = G[(i, j)]
+                acc = sum((ALPHA * (n - k) - k) * g[k] * r2[n - k]
+                          for k in range(n))
+                g.append(acc / (n * r2[0]))
+        if n == order:
+            break
+        ax = [mp.mpf(0)] * n_bodies
+        ay = [mp.mpf(0)] * n_bodies
+        for (i, j) in pairs:
+            g = G[(i, j)]
+            dx = [X[j][k] - X[i][k] for k in range(n + 1)]
+            dy = [Y[j][k] - Y[i][k] for k in range(n + 1)]
+            px = sum(dx[k] * g[n - k] for k in range(n + 1))
+            py = sum(dy[k] * g[n - k] for k in range(n + 1))
+            ax[i] += masses[j] * px
+            ay[i] += masses[j] * py
+            ax[j] -= masses[i] * px
+            ay[j] -= masses[i] * py
+        for i in range(n_bodies):
+            X[i].append(VX[i][n] / (n + 1))
+            Y[i].append(VY[i][n] / (n + 1))
+            VX[i].append(ax[i] / (n + 1))
+            VY[i].append(ay[i] / (n + 1))
+    return X, Y, VX, VY
+\end{verbatim}

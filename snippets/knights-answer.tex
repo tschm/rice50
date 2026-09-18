@@ -1,0 +1,20 @@
+\begin{verbatim}
+def corner_indicator():
+    """1 on every state with at least one knight on a corner."""
+    w = np.zeros(64 * 64)
+    for a in range(1, 65):
+        for b in range(1, 65):
+            if a in CORNERS or b in CORNERS:
+                w[state(a, b) - 1] = 1.0
+    return w
+
+
+def solve():
+    A = transition()
+    v = np.zeros(64 * 64)
+    v[state(*START) - 1] = 1.0
+    for _ in range(TURNS):
+        v = A @ v                      # not A**2005 applied to v
+    w = corner_indicator()
+    return A, v, w @ v
+\end{verbatim}

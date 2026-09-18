@@ -1,0 +1,15 @@
+\begin{verbatim}
+def lifted(c, n, dps=40):
+    """The trapezoid rule for the integral of f_c^+ over one period.
+
+    f_c^+(x) = exp(2i tan(tan(pi (x + i c)))) is analytic and has
+    period 1 for c > 0, so the trapezoid rule converges
+    geometrically and the answer must not depend on c at all.
+    """
+    mp.mp.dps = dps
+    total = mp.mpc(0)
+    for j in range(n):
+        z = mp.mpf(j) / n + mp.mpc(0, 1) * c
+        total += mp.e ** (2j * mp.tan(mp.tan(mp.pi * z)))
+    return total / n
+\end{verbatim}

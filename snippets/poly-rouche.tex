@@ -1,0 +1,25 @@
+\begin{verbatim}
+def minimum_modulus(M=TRUNCATION, radius=CIRCLE, samples=4096):
+    """min |p_M| on the circle of the given radius.
+
+    Sampled, then polished by a local search: the modulus of a
+    polynomial has no flat minima on a circle, so a fine sample finds
+    every basin.
+    """
+    mp.mp.dps = 40
+    coefficients = [mp.mpf(q) for q in PRIMES[:M + 1]][::-1]
+    def modulus(theta):
+        z = radius * mp.expjpi(2 * theta)
+        return abs(mp.polyval(coefficients, z))
+    grid = [(modulus(mp.mpf(j) / samples), mp.mpf(j) / samples)
+            for j in range(samples)]
+    value, theta = min(grid)
+    step = mp.mpf(1) / samples
+    for _ in range(60):
+        step /= 2
+        for candidate in (theta - step, theta + step):
+            trial = modulus(candidate)
+            if trial < value:
+                value, theta = trial, candidate
+    return value
+\end{verbatim}

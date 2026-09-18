@@ -1,0 +1,10 @@
+\begin{verbatim}
+def moves(p):
+    """The squares a knight standing on square p can jump to."""
+    row, col = divmod(p - 1, 8)
+    jumps = ((2, -1), (2, 1), (1, -2), (1, 2),
+             (-2, -1), (-2, 1), (-1, -2), (-1, 2))
+    return [8 * (row + dr) + (col + dc) + 1
+            for dr, dc in jumps
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8]
+\end{verbatim}

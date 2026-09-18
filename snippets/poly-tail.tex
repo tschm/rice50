@@ -1,0 +1,11 @@
+\begin{verbatim}
+def tail_bound(M=TRUNCATION, radius=CIRCLE):
+    """A bound for |p - p_M| on |x| = radius.
+
+    The coefficients increase, so every one of the omitted terms is at
+    most a_10000 radius^(M+1).
+    """
+    mp.mp.dps = 40
+    terms = DEGREE - M
+    return terms * PRIMES[DEGREE] * radius ** (M + 1)
+\end{verbatim}

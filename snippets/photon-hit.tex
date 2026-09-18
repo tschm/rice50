@@ -1,0 +1,21 @@
+\begin{verbatim}
+def hit(p, v, a, b, leaving):
+    """Smallest t > 0 with (px+t vx)^2/a^2 + (py+t vy)^2/b^2 = 1.
+
+    `leaving` says the photon is sitting on this mirror, so t = 0 is a
+    root: divide it out rather than filter roots by a threshold.
+    """
+    qa = v[0] ** 2 / a ** 2 + v[1] ** 2 / b ** 2
+    qb = 2 * (p[0] * v[0] / a ** 2 + p[1] * v[1] / b ** 2)
+    if leaving:
+        t = -qb / qa
+        return t if t > 0 else mp.inf
+    qc = p[0] ** 2 / a ** 2 + p[1] ** 2 / b ** 2 - 1
+    disc = qb * qb - 4 * qa * qc
+    if disc < 0:
+        return mp.inf
+    root = mp.sqrt(disc)
+    ts = [t for t in ((-qb - root) / (2 * qa),
+                      (-qb + root) / (2 * qa)) if t > 0]
+    return min(ts) if ts else mp.inf
+\end{verbatim}

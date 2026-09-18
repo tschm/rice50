@@ -1,0 +1,14 @@
+\begin{verbatim}
+def companion(coefficients):
+    """Companion matrix of the monic multiple of the polynomial.
+
+    coefficients[k] multiplies x^k, so the leading one is last.
+    """
+    a = np.array(coefficients, dtype=float)
+    a = -a[:-1] / a[-1]
+    n = len(a)
+    A = np.zeros((n, n))
+    A[0] = a[::-1]
+    A[1:, :-1] = np.eye(n - 1)
+    return A
+\end{verbatim}

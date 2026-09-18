@@ -1,0 +1,19 @@
+\begin{verbatim}
+def integrate(rtol, shift=0.0, method="DOP853"):
+    """|u_4(5)|, from a start optionally displaced by shift."""
+    u0 = np.array(POSITIONS, dtype=complex)
+    u0[WATCHED] += shift
+    y0 = np.concatenate([u0.real, u0.imag,
+                         np.real(VELOCITIES), np.imag(VELOCITIES)])
+
+    def rhs(t, y):
+        u = y[:5] + 1j * y[5:10]
+        v = y[10:15] + 1j * y[15:]
+        a = field(u, v)
+        return np.concatenate([v.real, v.imag, a.real, a.imag])
+
+    s = solve_ivp(rhs, [0, TEND], y0, method=method,
+                  rtol=rtol, atol=1e-17)
+    y = s.y[:, -1]
+    return abs(complex(y[WATCHED], y[5 + WATCHED])), s.nfev
+\end{verbatim}

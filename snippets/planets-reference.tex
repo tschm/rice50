@@ -1,0 +1,16 @@
+\begin{verbatim}
+def reference(order=40, dps=30, tol=24):
+    """|u_4(5)| from the Taylor integrator, outside floating point."""
+    masses = [mp.mpf(m) for m in MASSES]
+    state = ([mp.re(z) for z in POSITIONS],
+             [mp.im(z) for z in POSITIONS],
+             [mp.re(z) for z in VELOCITIES],
+             [mp.im(z) for z in VELOCITIES])
+    before = taylor.energy(*state, masses)
+    x, y, vx, vy, steps = taylor.integrate(
+        state, masses, mp.mpf(TEND), order=order, dps=dps,
+        tol=mp.mpf(10) ** -tol)
+    after = taylor.energy(x, y, vx, vy, masses)
+    return dict(distance=mp.sqrt(x[WATCHED] ** 2 + y[WATCHED] ** 2),
+                steps=steps, drift=abs(after - before), order=order)
+\end{verbatim}

@@ -1,0 +1,17 @@
+\begin{verbatim}
+def integrate(state, masses, tend, order=20, dps=30, tol=None):
+    """Advance (x, y, vx, vy) to t = tend, returning the state."""
+    mp.mp.dps = dps
+    tol = tol if tol is not None else mp.mpf(10) ** (-dps + 4)
+    x, y, vx, vy = ([mp.mpf(c) for c in part] for part in state)
+    t, steps = mp.mpf(0), 0
+    while t < tend:
+        X, Y, VX, VY = coefficients(x, y, vx, vy, masses, order)
+        h = min(step_size(X + Y + VX + VY, order, tol), tend - t)
+        x = [horner(s, h) for s in X]
+        y = [horner(s, h) for s in Y]
+        vx = [horner(s, h) for s in VX]
+        vy = [horner(s, h) for s in VY]
+        t, steps = t + h, steps + 1
+    return x, y, vx, vy, steps
+\end{verbatim}

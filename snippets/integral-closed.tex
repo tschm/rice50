@@ -1,0 +1,6 @@
+\begin{verbatim}
+def closed_form(dps=40):
+    """(1 - e^{-2 tanh 1})/2, the value the contour argument gives."""
+    mp.mp.dps = dps
+    return (1 - mp.e ** (-2 * mp.tanh(1))) / 2
+\end{verbatim}

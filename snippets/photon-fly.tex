@@ -1,0 +1,20 @@
+\begin{verbatim}
+def fly(dps, shift=0, trace=False):
+    """Distance from the origin at t = 60, at dps working digits."""
+    mp.mp.dps = dps
+    p = (mp.mpf(START[0]) + shift, mp.mpf(START[1]))
+    v = (mp.mpf(DIRECTION[0]), mp.mpf(DIRECTION[1]))
+    path, on, bounces, rem = [p], None, 0, mp.mpf(TEND)
+    while rem > 0:
+        dt, k = min((hit(p, v, a, b, on == i), i)
+                    for i, (a, b) in enumerate(MIRRORS))
+        dt = min(dt, rem)
+        p, rem = (p[0] + dt * v[0], p[1] + dt * v[1]), rem - dt
+        if trace:
+            path.append(p)
+        if rem > 0:
+            v = reflect(p, v, *MIRRORS[k])
+            on, bounces = k, bounces + 1
+    return dict(distance=mp.sqrt(p[0] ** 2 + p[1] ** 2),
+                bounces=bounces, path=path)
+\end{verbatim}

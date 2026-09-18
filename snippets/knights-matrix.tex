@@ -1,0 +1,27 @@
+\begin{verbatim}
+def transition():
+    """The column-stochastic matrix of the chain on the 4096 states.
+
+    Each player picks uniformly among the squares his knight can
+    reach, the square held by the other knight excluded.  If both
+    pick the same square nobody moves and the turn is passed, which
+    is the diagonal entry.
+    """
+    A = sp.lil_matrix((64 * 64, 64 * 64))
+    for i in range(1, 65):
+        for j in range(1, 65):
+            if i == j or colour(i) != colour(j):
+                continue     # unreachable: they move together
+            to_i = [q for q in moves(i) if q != j]
+            to_j = [q for q in moves(j) if q != i]
+            n = len(to_i) * len(to_j)
+            passed = 0
+            for a in to_i:
+                for b in to_j:
+                    if a == b:
+                        passed += 1
+                    else:
+                        A[state(a, b) - 1, state(i, j) - 1] += 1 / n
+            A[state(i, j) - 1, state(i, j) - 1] += passed / n
+    return A.tocsc()
+\end{verbatim}

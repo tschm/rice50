@@ -1,0 +1,11 @@
+\begin{verbatim}
+def step_size(series, order, tol):
+    """Jorba-Zou: match the last two terms of each series to tol."""
+    h = mp.inf
+    for s in series:
+        for n in (order - 1, order):
+            c = abs(s[n])
+            if c > 0:
+                h = min(h, (tol / c) ** (mp.mpf(1) / n))
+    return h / 2
+\end{verbatim}
