@@ -1,0 +1,95 @@
+name: paper
+
+# Rebuild digit50.pdf from source -- code/paper.py computes every number and
+# writes the figures, tables and listings -- and publish it to the orphan
+# branch `paper`, which holds that one file and shares no history with main.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: paper-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Not shallow: the publish step pushes a commit parented on the
+          # current tip of `paper`, and pushing out of a shallow clone is
+          # needlessly delicate.
+          fetch-depth: 0
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-fonts-recommended
+          pdflatex --version | head -1
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Build
+        run: |
+          # pdfTeX and matplotlib both stamp a creation date into their output.
+          # Pinning it to the commit date makes the PDF a function of the
+          # source alone, so an unchanged source produces an identical file
+          # and the publish step below has something to compare.
+          export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+          export FORCE_SOURCE_DATE=1
+          make
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: digit50
+          path: digit50.pdf
+          if-no-files-found: error
+
+      - name: Publish to the paper branch
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Build the commit with plumbing rather than checking the branch out:
+          # the tree is written from scratch, so `paper` holds digit50.pdf and
+          # nothing else, whatever is lying around in the working directory.
+          blob=$(git hash-object -w digit50.pdf)
+          tree=$(printf '100644 blob %s\tdigit50.pdf\n' "$blob" | git mktree)
+
+          parent=""
+          if git fetch --quiet origin paper 2>/dev/null; then
+            parent=$(git rev-parse FETCH_HEAD)
+            if [ "$(git rev-parse "$parent^{tree}")" = "$tree" ]; then
+              echo "paper already holds this PDF, nothing to push"
+              exit 0
+            fi
+          else
+            echo "no paper branch yet, starting one"
+          fi
+
+          message="digit50.pdf from ${GITHUB_SHA}"
+          if [ -n "$parent" ]; then
+            commit=$(git commit-tree "$tree" -p "$parent" -m "$message")
+          else
+            # First run: a commit with no parent, which is what makes the
+            # branch an orphan.
+            commit=$(git commit-tree "$tree" -m "$message")
+          fi
+
+          git push origin "$commit:refs/heads/paper"
+          echo "pushed $commit to paper"

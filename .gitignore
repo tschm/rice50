@@ -1,0 +1,25 @@
+# Everything below is produced by `make` from digit50.tex and code/*.py.
+
+# The built paper
+digit50.pdf
+
+# pdfLaTeX intermediates
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.fls
+*.synctex.gz
+
+# Written by code/paper.py
+figs/
+tables/
+snippets/
+.assets.stamp
+
+# Python
+__pycache__/
