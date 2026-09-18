@@ -36,7 +36,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             texlive-latex-base \
             texlive-latex-recommended \
-            texlive-fonts-recommended
+            texlive-fonts-recommended \
+            lmodern
           pdflatex --version | head -1
 
       - uses: astral-sh/setup-uv@v6
